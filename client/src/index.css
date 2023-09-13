@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+    font-family: 'Roboto';
+}
+
+body {
+    background-color: #4446c253;
+}
+
+input {
+    height: 40px;
+    border: 1px solid #4446c253;
+    padding: 10px;
+}
+
+input:focus {
+    outline: none;
+    border: 1px solid #4446c2;
+}
+
+.outline-btn {
+    border: 1px solid #4D426D;
+    color: white;
+    padding: 5px 20px;
+    height: 40px;
+    text-transform: uppercase;
+}
+
+.contained-btn {
+    background-color: #4D426D;
+    color: white;
+    padding: 5px 20px;
+    height: 40px;
+    text-transform: uppercase;
+}
