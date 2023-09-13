@@ -15,7 +15,6 @@ export function Register() {
     ev.preventDefault();
     try {
       const response = await registerUser(user);
-      console.log("response", response);
       if (response.success) {
         toast.success(response.message);
         window.location.href = "/login";

@@ -1,18 +1,19 @@
 import { User } from "@/types/user";
 import { axiosInstance } from ".";
 
-export const loginUser = async (user: Omit<User, "name">) => {
+export const registerUser = async (user: User) => {
   try {
-    const response = await axiosInstance.post("/api/users/login", user);
+    const response = await axiosInstance.post("/api/users/register", user);
     return response.data;
   } catch (error: any) {
+    console.log("error", error);
     return error.response.data;
   }
 };
 
-export const registerUser = async (user: User) => {
+export const loginUser = async (user: Omit<User, "name">) => {
   try {
-    const response = await axiosInstance.post("/api/users/register", user);
+    const response = await axiosInstance.post("/api/users/login", user);
     return response.data;
   } catch (error: any) {
     return error.response.data;
