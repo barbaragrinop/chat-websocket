@@ -1,5 +1,5 @@
 import express from "express";
-import dbConfig from "./config/db-config";
+import { dbConfig } from "./config/db-config";
 import { getUserRoutes } from "./routes/users-route";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -8,7 +8,7 @@ dotenv.config();
 
 const app = express();
 app.use(cors());
-dbConfig;
+dbConfig();
 
 const port = process.env.PORT || 5000;
 

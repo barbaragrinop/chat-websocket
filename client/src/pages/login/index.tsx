@@ -1,30 +1,40 @@
-import React, { useState, FormEvent } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, FormEvent, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { loginUser } from "../../api/users";
 
 function Login() {
+  const navigate = useNavigate();
   const [user, setUser] = useState({
     password: "",
     email: "",
   });
 
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      navigate("/");
+    }
+  }, []);
+
   const login = async (ev: FormEvent) => {
     ev.preventDefault();
     try {
       const response = await loginUser(user);
-      console.log("response", response);
       if (response.success) {
-        console.log("response", response);
         toast.success(response.message);
         localStorage.setItem("token", response.data);
-        window.location.href = "/";
+        console.log("login deu certo");
+        console.log(
+          '${localStorage.getItem("token")}',
+          localStorage.getItem("token")
+        );
+
+        navigate("/");
       } else {
         toast.error(response.message);
       }
     } catch (error: any) {
       toast.error(error.message);
-      toast.error(error.response.data.message);
     }
   };
   return (

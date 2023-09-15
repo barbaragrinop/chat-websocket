@@ -1,15 +1,23 @@
-import React, { FormEvent, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { FormEvent, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "../../api/users";
 import toast from "react-hot-toast";
 import { User } from "@/types/user";
 
 export function Register() {
+  const navigate = useNavigate();
+
   const [user, setUser] = useState<User>({
     name: "",
     password: "",
     email: "",
   });
+
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      navigate("/");
+    }
+  }, []);
 
   const register = async (ev: FormEvent) => {
     ev.preventDefault();
@@ -17,7 +25,7 @@ export function Register() {
       const response = await registerUser(user);
       if (response.success) {
         toast.success(response.message);
-        window.location.href = "/login";
+        navigate("/login");
       } else {
         toast.error(response.message);
       }

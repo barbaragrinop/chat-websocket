@@ -6,7 +6,6 @@ export const registerUser = async (user: User) => {
     const response = await axiosInstance.post("/api/users/register", user);
     return response.data;
   } catch (error: any) {
-    console.log("error", error);
     return error.response.data;
   }
 };
@@ -14,6 +13,16 @@ export const registerUser = async (user: User) => {
 export const loginUser = async (user: Omit<User, "name">) => {
   try {
     const response = await axiosInstance.post("/api/users/login", user);
+    return response.data;
+  } catch (error: any) {
+    return error.response.data;
+  }
+};
+
+export const getCurrentUser = async () => {
+  try {
+    const response = await axiosInstance.get("/api/users/get-current-user");
+    console.log("response", response);
     return response.data;
   } catch (error: any) {
     return error.response.data;
