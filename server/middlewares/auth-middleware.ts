@@ -1,20 +1,24 @@
-import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
+import { verify } from "jsonwebtoken";
+import dotenv from "dotenv";
 
-export const authMiddleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export default (req: Request, res: Response, next: NextFunction) => {
+  dotenv.config();
+
   try {
-    const token = req.headers.authorization?.split(" ")[1];
-    const decoded = jwt.verify(token!, process.env.JWTSECRET!);
+    const token = req.headers.authorization?.split(" ")[1]!;
 
-    req.body.userId = (decoded as any).userId;
-    next();
+    if (token) {
+      const decoded: any = verify(token, process.env.JWTSECRET!);
+
+      req.body.userId = decoded.userId;
+      next();
+    }
   } catch (error: any) {
-    return res.status(401).json({
-      message: "[Unauthorized]: " + error.message,
+    console.error("[Auth Middleware Error]", error.message);
+
+    res.status(401).json({
+      message: error.message,
       success: false,
     });
   }

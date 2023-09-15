@@ -3,9 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "../../api/users";
 import toast from "react-hot-toast";
 import { User } from "@/types/user";
+import { useDispatch } from "react-redux";
+import { hideLoader, showLoader } from "@/redux/loader-slice";
 
 export function Register() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [user, setUser] = useState<User>({
     name: "",
@@ -22,7 +25,10 @@ export function Register() {
   const register = async (ev: FormEvent) => {
     ev.preventDefault();
     try {
+      dispatch(showLoader());
       const response = await registerUser(user);
+      dispatch(hideLoader());
+
       if (response.success) {
         toast.success(response.message);
         navigate("/login");
@@ -30,6 +36,7 @@ export function Register() {
         toast.error(response.message);
       }
     } catch (error: any) {
+      dispatch(hideLoader());
       toast.error(error.message);
     }
   };

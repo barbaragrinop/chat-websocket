@@ -2,9 +2,12 @@ import React, { useState, FormEvent, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { loginUser } from "../../api/users";
+import { useDispatch } from "react-redux";
+import { hideLoader, showLoader } from "../../redux/loader-slice";
 
 function Login() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [user, setUser] = useState({
     password: "",
     email: "",
@@ -19,21 +22,18 @@ function Login() {
   const login = async (ev: FormEvent) => {
     ev.preventDefault();
     try {
+      dispatch(showLoader());
       const response = await loginUser(user);
+      dispatch(hideLoader());
       if (response.success) {
         toast.success(response.message);
         localStorage.setItem("token", response.data);
-        console.log("login deu certo");
-        console.log(
-          '${localStorage.getItem("token")}',
-          localStorage.getItem("token")
-        );
-
-        navigate("/");
+        window.location.href = "/";
       } else {
         toast.error(response.message);
       }
     } catch (error: any) {
+      dispatch(hideLoader());
       toast.error(error.message);
     }
   };

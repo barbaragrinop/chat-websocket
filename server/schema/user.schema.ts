@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
-import { IUserMongoose } from "../types/IUserMongoose";
+import { IUserSchema } from "../types/IUserSchema";
 
-const schema = new Schema<IUserMongoose>(
+const schema = new Schema<IUserSchema>(
   {
     name: {
       type: String,
@@ -25,4 +25,4 @@ const schema = new Schema<IUserMongoose>(
   }
 );
 
-export const UserSchema = mongoose.model<IUserMongoose>("users", schema);
+export const UserSchema = mongoose.model<IUserSchema>("users", schema);

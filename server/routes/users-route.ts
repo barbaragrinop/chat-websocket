@@ -1,8 +1,8 @@
 import { Router, Request, Response } from "express";
 import bcrypt from "bcryptjs";
-import { UserSchema } from "../schema/user-schema";
-import { IUserMongoose } from "../types/IUserMongoose";
-import { authMiddleware } from "../middlewares/auth-middleware";
+import { UserSchema } from "../schema/user.schema";
+import { IUserSchema } from "../types/IUserSchema";
+import authMiddleware from "../middlewares/auth-middleware";
 import jwt from "jsonwebtoken";
 
 export function getUserRoutes() {
@@ -22,7 +22,7 @@ export function getUserRoutes() {
 
       // Create a new user
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
-      const newUser: IUserMongoose = new UserSchema({
+      const newUser: IUserSchema = new UserSchema({
         name: req.body.name,
         email: req.body.email,
         password: hashedPassword,
@@ -67,9 +67,11 @@ export function getUserRoutes() {
       }
 
       // Create and assign a token
-      const token = jwt.sign({ userId: user._id }, process.env.JWTSECRET!, {
+      // @ts-ignore
+      const token = jwt.sign({ userId: user._id }, process.env.JWTSECRET, {
         expiresIn: "1d",
       });
+      console.log("process.env.JWTSECRET,", process.env.JWTSECRET);
       console.log("[LOGIN TOKEN]", token);
 
       res.json({
@@ -85,28 +87,6 @@ export function getUserRoutes() {
     }
   });
 
-  router.get("/all", async (req: Request, res: Response) => {
-    try {
-      const users = await UserSchema.find();
-      if (!users) {
-        return res.status(400).json({
-          success: false,
-          message: "No users found",
-        });
-      }
-
-      res.status(200).json({
-        success: true,
-        data: users,
-      });
-    } catch (error) {
-      res.send({
-        success: false,
-        message: error,
-      });
-    }
-  });
-
   router.get(
     "/get-current-user",
     authMiddleware,
@@ -115,10 +95,43 @@ export function getUserRoutes() {
         const currentUser = await UserSchema.findOne({
           _id: req.body.userId,
         });
-        res.send({
+
+        if (currentUser === null) {
+          return res.status(400).json({
+            success: false,
+            message: "User not found",
+          });
+        }
+
+        res.json({
           success: true,
           data: currentUser,
           message: "User found successfully",
+        });
+      } catch (error: any) {
+        res.status(500).json({
+          message: error.message,
+          success: false,
+        });
+      }
+    }
+  );
+
+  router.get(
+    "/get-all-users",
+    authMiddleware,
+    async (req: Request, res: Response) => {
+      try {
+        const users = await UserSchema.find({
+          _id: {
+            $ne: req.body.userId,
+          },
+        });
+
+        res.status(200).json({
+          success: true,
+          message: "Users fetched successfully",
+          data: users,
         });
       } catch (error) {
         res.send({

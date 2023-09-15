@@ -1,8 +1,16 @@
 import axios from "axios";
 
-export const axiosInstance = axios.create({
-  baseURL: "http://localhost:3001",
-  headers: {
-    authorization: `Bearer ${localStorage.getItem("token")}`,
-  },
-});
+// Função para criar uma instância do axios com o token JWT
+const createAxiosInstance = () => {
+  const token = localStorage.getItem("token");
+  console.log("token", token);
+
+  return axios.create({
+    baseURL: "http://localhost:3001",
+    headers: {
+      authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const axiosInstance = createAxiosInstance();
