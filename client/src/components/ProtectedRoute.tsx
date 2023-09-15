@@ -1,13 +1,13 @@
-import { User } from "@/types/user";
 import { getAllUsers, getCurrentUser } from "../api/users";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { hideLoader, showLoader } from "@/redux/loader-slice";
-import { setAllUsers, setUser } from "@/redux/users-slice";
+import { setAllUsers, setUser, setAllChats } from "@/redux/users-slice";
 import { TbLogout } from "react-icons/tb";
 import { FaRegUserCircle } from "react-icons/fa";
+import { getAllChats } from "@/api/chats";
 
 export default function ProtectedRoute(props: any) {
   const navigate = useNavigate();
@@ -19,11 +19,13 @@ export default function ProtectedRoute(props: any) {
       dispatch(showLoader());
       const response = await getCurrentUser();
       const allUsersResponse = await getAllUsers();
+      const allChats = await getAllChats();
       dispatch(hideLoader());
 
       if (response.success) {
         dispatch(setUser(response.data));
         dispatch(setAllUsers(allUsersResponse.data));
+        dispatch(setAllChats(allChats.data));
         return true;
       } else {
         navigate("/login");

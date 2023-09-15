@@ -7,16 +7,22 @@ type Props = {
 };
 
 export default function UsersList({ searchKey }: Props) {
-  const { allUsers } = useSelector((state: any) => state.userReducer);
+  const { allUsers, allChats, user } = useSelector(
+    (state: any) => state.userReducer
+  );
 
   return (
-    <div className="flex flex-col gap-3 ">
+    <div className="flex flex-col gap-3 " key={searchKey}>
       {allUsers
-        .filter((user: UserType) =>
-          user.name.toLowerCase().includes(searchKey.toLowerCase())
+        .filter(
+          (userObj: UserType) =>
+            userObj.name.toLowerCase().includes(searchKey.toLowerCase()) &&
+            searchKey
         )
-        .map((user: UserType) => (
-          <User user={user} />
+        .map((userObj: UserType) => (
+          <>
+            <User user={userObj} key={userObj.email + userObj.name} />
+          </>
         ))}
     </div>
   );

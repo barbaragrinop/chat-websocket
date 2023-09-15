@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { IMessageSchema } from "../types/IMessageschema";
 
 const messageSchema = new mongoose.Schema(
   {
@@ -22,4 +23,9 @@ const messageSchema = new mongoose.Schema(
   {
     timestamps: true,
   }
+);
+
+export const MessageSchema = mongoose.model<IMessageSchema>(
+  "messages",
+  messageSchema
 );

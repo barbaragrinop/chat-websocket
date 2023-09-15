@@ -2,7 +2,7 @@ import React from "react";
 
 export default function Loader() {
   return (
-    <div className="absolute inset-0 bg-black opacity-70 flex items-center justify-center">
+    <div className="absolute inset-0 bg-black opacity-70 flex items-center justify-center z-[999]">
       <div role="status">
         <svg
           aria-hidden="true"

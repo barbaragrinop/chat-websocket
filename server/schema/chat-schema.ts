@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { IChatSchema } from "../types/IChatSchema";
 
 const chatSchema = new mongoose.Schema(
   {
@@ -24,4 +25,4 @@ const chatSchema = new mongoose.Schema(
   }
 );
 
-export const UserSchema = mongoose.model<IUserMongoose>("users", schema);
+export const ChatSchema = mongoose.model<IChatSchema>("chats", chatSchema);

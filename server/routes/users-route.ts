@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import bcrypt from "bcryptjs";
-import { UserSchema } from "../schema/user.schema";
+import { UserSchema } from "../schema/user-schema";
 import { IUserSchema } from "../types/IUserSchema";
 import authMiddleware from "../middlewares/auth-middleware";
 import jwt from "jsonwebtoken";
