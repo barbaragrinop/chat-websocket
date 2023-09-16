@@ -5,5 +5,5 @@ export interface User {
   name: string;
   password: string;
   profilePic?: string;
-  _id?: ObjectId;
+  _id: ObjectId;
 }

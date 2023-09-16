@@ -4,6 +4,7 @@ import { getUserRoutes } from "./routes/users-route";
 import dotenv from "dotenv";
 import cors from "cors";
 import { getChats } from "./routes/chats-route";
+import { getMessages } from "./routes/messages-route";
 
 dotenv.config();
 
@@ -17,5 +18,6 @@ app.use(express.json());
 
 app.use("/api/users", getUserRoutes());
 app.use("/api/chats", getChats());
+app.use("/api/messages", getMessages());
 
 app.listen(port, () => console.log(`Server running on port ${port}`));

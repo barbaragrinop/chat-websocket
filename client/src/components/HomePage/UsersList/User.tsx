@@ -1,11 +1,12 @@
 import { createNewChat } from "@/api/chats";
 import { Button } from "@/components/Button";
 import { hideLoader, showLoader } from "@/redux/loader-slice";
-import { setAllChats } from "@/redux/users-slice";
+import { setAllChats, setSelectedChat } from "@/redux/users-slice";
 import { User as UserType } from "@/types/user";
 import { ObjectId } from "mongodb";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
+import UserProfilePicture from "../UserProfilePicture";
 
 type Props = {
   user: UserType;
@@ -14,7 +15,9 @@ type Props = {
 export default function User({ user: currentMappedUser }: Props) {
   const dispatch = useDispatch();
 
-  const { allChats, user } = useSelector((state: any) => state.userReducer);
+  const { allChats, user, selectedChat } = useSelector(
+    (state: any) => state.userReducer
+  );
 
   async function createNewUsersChat(receipentUserId: ObjectId) {
     try {
@@ -35,26 +38,45 @@ export default function User({ user: currentMappedUser }: Props) {
     }
   }
 
+  function openChat() {
+    const chat = allChats.find(
+      (chat: any) =>
+        chat.members.map((m: UserType) => m._id).includes(user._id) &&
+        chat.members.map((m: UserType) => m._id).includes(currentMappedUser._id)
+    );
+
+    if (chat) {
+      dispatch(setSelectedChat(chat));
+    }
+  }
+
+  function highlightChat() {
+    if (selectedChat.members) {
+      return selectedChat?.members
+        .map((member: UserType) => member._id)
+        .includes(currentMappedUser._id);
+    }
+
+    return "";
+  }
+
   return (
     <div
-      className="border flex justify-between rounded-2xl p-5 bg-white shadow-sm"
-      key={currentMappedUser.profilePic + currentMappedUser.email}
+      className={`cursor-pointer flex justify-between rounded-xl  p-3  bg-shadow-sm 
+        hover:border-primary border-2 transition-all
+          ${highlightChat() ? "bg-primary text-white " : "bg-white"}
+        `}
+      onClick={() => openChat()}
     >
       <div className="flex gap-5">
-        <img
-          src={
-            currentMappedUser.profilePic
-              ? currentMappedUser.profilePic
-              : "https://forum.truckersmp.com/uploads/monthly_2019_09/imported-photo-12263.thumb.png.0a337947bd0458971e73616909a5b1f8.png"
-          }
-          alt="Profile Picture"
-          className="w-10 h-10 rounded-full"
-        />
+        <UserProfilePicture profilePicture={currentMappedUser.profilePic} />
         <h1>{currentMappedUser.name}</h1>
       </div>
       <div onClick={() => createNewUsersChat(currentMappedUser._id!)}>
         {!allChats.find((chat: any) =>
-          chat.members.includes(currentMappedUser._id)
+          chat.members
+            .map((member: UserType) => member._id)
+            .includes(currentMappedUser._id)
         ) && <Button.CreateChat />}
       </div>
     </div>
