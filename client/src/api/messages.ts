@@ -1,5 +1,6 @@
 import { Message } from "@/types/messages";
-import { axiosInstance } from ".";
+import { axiosInstance, fetcher } from ".";
+import useSWR from "swr";
 
 export const SendMessage = async (message: Message) => {
   try {
@@ -14,7 +15,6 @@ export const SendMessage = async (message: Message) => {
 };
 
 export const getCurrentChatMessages = async (chatId: string) => {
-  console.log("chatId", chatId);
   try {
     const response = await axiosInstance.get(
       `/api/messages/get-all-messages/${chatId}`

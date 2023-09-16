@@ -40,6 +40,7 @@ export function getChats() {
           },
         })
           .populate("members")
+          .populate("lastMessage")
           .sort({
             updatedAt: -1,
           });

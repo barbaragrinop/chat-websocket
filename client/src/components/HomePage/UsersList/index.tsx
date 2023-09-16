@@ -22,7 +22,7 @@ export default function UsersList({ searchKey }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-3 " key={searchKey}>
+    <div className="flex flex-col gap-3 min-w-full" key={searchKey}>
       {getData().map((userObj: UserType) => (
         <User user={userObj} key={userObj.email + userObj.name} />
       ))}

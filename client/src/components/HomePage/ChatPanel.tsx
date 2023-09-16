@@ -3,34 +3,28 @@ import UserProfilePicture from "./UserProfilePicture";
 import { AiOutlineSend } from "react-icons/ai";
 import { Message } from "@/types/messages";
 import { useEffect, useState } from "react";
-import { SendMessage, getCurrentChatMessages } from "@/api/messages";
+import { SendMessage } from "@/api/messages";
 import { hideLoader, showLoader } from "@/redux/loader-slice";
 import toast from "react-hot-toast";
+import { useCurrentChatMessages } from "@/hooks/useCurrentChatMessage";
+import { User } from "@/types/user";
+import { Chat } from "@/types/chat";
 
 export function ChatPanel() {
   const dispatch = useDispatch();
-  const { selectedChat, user } = useSelector((state: any) => state.userReducer);
+  const { selectedChat, user, allChats } = useSelector(
+    (state: any) => state.userReducer
+  );
   const [newMessage, setNewMessage] = useState<string>("");
-  const [messages = [], setMessages] = useState<Message[]>();
+  const { messages, isError, isLoading, mutate } = useCurrentChatMessages(
+    selectedChat._id
+  );
 
   useEffect(() => {
-    getMessages();
-  }, [selectedChat]);
-
-  async function getMessages() {
-    try {
-      if (!selectedChat) return;
-      dispatch(showLoader());
-      const response = await getCurrentChatMessages(selectedChat._id);
-      dispatch(hideLoader());
-      if (response.success) {
-        setMessages(response.data);
-      }
-    } catch (error: any) {
-      dispatch(hideLoader());
-      toast.error(error);
-    }
-  }
+    isLoading ? dispatch(showLoader()) : dispatch(hideLoader());
+    isError && toast.error("Error fetching messages");
+    mutate();
+  }, [selectedChat, messages]);
 
   const receipentUser =
     selectedChat.members &&
@@ -46,6 +40,7 @@ export function ChatPanel() {
         read: false,
       };
       const response = await SendMessage(message);
+      mutate();
       dispatch(hideLoader());
 
       if (response.sucess) {
@@ -70,27 +65,29 @@ export function ChatPanel() {
         )}
       </div>
       <div className="overflow-auto py-5 pr-4 h-[calc(100vh_-_120px)] ">
-        {messages.map((message: Message) => (
-          <div
-            key={message.text + message.sender}
-            className={`flex overflow-hidden flex-col gap-1  ${
-              message.sender === user._id ? "items-end" : "items-start"
-            }`}
-          >
+        {messages &&
+          messages.data &&
+          messages.data?.map((message: Message) => (
             <div
-              className={`p-3 rounded-2xl break-words max-w-[90%] ${
-                message.sender === user._id
-                  ? "bg-primary text-white"
-                  : "bg-gray-200"
+              key={message.text + message.sender}
+              className={`flex overflow-hidden flex-col gap-1  ${
+                message.sender === user._id ? "items-end" : "items-start"
               }`}
             >
-              {message.text}
+              <div
+                className={`p-3 rounded-2xl break-words max-w-[90%] ${
+                  message.sender === user._id
+                    ? "bg-primary text-white"
+                    : "bg-gray-200"
+                }`}
+              >
+                <p>{message.text}</p>
+              </div>
+              <span className="text-xs text-gray-500">
+                {new Date(message.createdAt!).toLocaleString()}
+              </span>
             </div>
-            <span className="text-xs text-gray-500">
-              {new Date(message.createdAt!).toLocaleString()}
-            </span>
-          </div>
-        ))}
+          ))}
       </div>
       <div className="h-[60px] ">
         <div className="h-14 rounded-xl border flex overflow-hidden">
