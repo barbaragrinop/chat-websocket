@@ -5,6 +5,6 @@ export interface Message {
   chat: Chat;
   sender: User;
   text: string;
-  read: boolean;
+  read?: boolean;
   createdAt?: Date;
 }

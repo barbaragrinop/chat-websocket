@@ -14,6 +14,8 @@ export function getChats() {
       try {
         const newChat = new ChatSchema(req.body);
         const savedChat = await newChat.save();
+
+        await savedChat.populate("members");
         res.send({
           sucess: true,
           message: "Chat created successfully",

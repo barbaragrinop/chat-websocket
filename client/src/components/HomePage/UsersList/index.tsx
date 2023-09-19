@@ -1,31 +1,35 @@
 import { User as UserType } from "@/types/user";
 import { useSelector } from "react-redux";
 import User from "./User";
-import { Chat } from "@/types/chat";
+import { RootState } from "@/redux/store";
 
 type Props = {
   searchKey: string;
 };
 
 export default function UsersList({ searchKey }: Props) {
-  const { allUsers, allChats } = useSelector((state: any) => state.userReducer);
+  const { allUsers, allChats, user } = useSelector(
+    (state: RootState) => state.userReducer
+  );
 
   function getData() {
-    return allUsers.filter(
-      (userObj: UserType) =>
-        (userObj.name.toLowerCase().includes(searchKey.toLowerCase()) &&
-          searchKey) ||
-        allChats.some((chat: Chat) =>
-          chat.members.map((member) => member._id).includes(userObj._id)
-        )
+    if (!searchKey) return allChats;
+    return allUsers.filter((userObj: UserType) =>
+      userObj.name.toLowerCase().includes(searchKey.toLowerCase())
     );
   }
 
   return (
     <div className="flex flex-col gap-3 min-w-full" key={searchKey}>
-      {getData().map((userObj: UserType) => (
-        <User user={userObj} key={userObj.email + userObj.name} />
-      ))}
+      {getData().map((chatObjOrUserObj: any) => {
+        let userObj = chatObjOrUserObj;
+        if (chatObjOrUserObj.members) {
+          userObj = chatObjOrUserObj.members.find(
+            (member: any) => member._id !== user._id
+          );
+        }
+        return <User user={userObj} key={userObj.email + userObj.name} />;
+      })}
     </div>
   );
 }

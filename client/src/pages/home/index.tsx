@@ -3,8 +3,10 @@ import { UserSearch } from "@/components/HomePage/UserSearch";
 import UsersList from "@/components/HomePage/UsersList";
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { io } from "socket.io-client";
 
 function Home() {
+  const socket = io("http://localhost:3001"); //connection port
   const [searchKey, setSearchKey] = useState("");
   const { selectedChat } = useSelector((state: any) => state.userReducer);
 

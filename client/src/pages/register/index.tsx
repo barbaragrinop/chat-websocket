@@ -28,7 +28,6 @@ export function Register() {
       dispatch(showLoader());
       const response = await registerUser(user);
       dispatch(hideLoader());
-
       if (response.success) {
         toast.success(response.message);
         navigate("/login");

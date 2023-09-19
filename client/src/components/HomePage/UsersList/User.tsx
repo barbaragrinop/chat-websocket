@@ -7,9 +7,7 @@ import { ObjectId } from "mongodb";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import UserProfilePicture from "../UserProfilePicture";
-import { useCurrentChatMessages } from "@/hooks/useCurrentChatMessage";
 import { Chat } from "@/types/chat";
-import { format } from "date-fns";
 import { formatDateTime } from "@/utils/formatDateTime";
 
 type Props = {
@@ -37,11 +35,12 @@ export default function User({ user: currentMappedUser }: Props) {
     return `${lastMsgSender + msg}`;
   }
 
-  function getHourLastMessage(): string {
+  function getHourLastMessage() {
     if (!chat) return "";
     if (!chat.lastMessage) return "";
     return formatDateTime(chat.lastMessage.createdAt);
   }
+
   async function createNewUsersChat(receipentUserId: ObjectId) {
     try {
       dispatch(showLoader());
@@ -52,6 +51,8 @@ export default function User({ user: currentMappedUser }: Props) {
         const newChat = response.data;
         const updatedChats = [...allChats, newChat];
         dispatch(setAllChats(updatedChats));
+        dispatch(setSelectedChat(newChat));
+        openChat();
       } else {
         toast.error("Error creating chat");
       }
@@ -83,32 +84,66 @@ export default function User({ user: currentMappedUser }: Props) {
     return "";
   }
 
+  function getUnreadMessages() {
+    if (!allChats) return;
+    const chat: Chat = allChats.find((chat: any) =>
+      chat.members
+        .map((mem: UserType) => mem._id)
+        .includes(currentMappedUser._id)
+    );
+    if (chat && chat.unreadMessages && chat.lastMessage.sender !== user._id) {
+      return (
+        <div className="flex items-center justify-center  w-5 h-5 py-2 bg-primary rounded-full">
+          <small className="text-white text-center mt-[2px] ">
+            {chat.unreadMessages}
+          </small>
+        </div>
+      );
+    }
+  }
   return (
     <div
-      className={`cursor-pointer min-w-full flex justify-between rounded-xl  p-3  bg-shadow-sm 
+      className={`cursor-pointer min-w-full flex justify-between rounded-xl  p-3  bg-shadow-sm  max-w-[384px] overflow-hidden 
         hover:border-primary border-2 transition-all
-          ${highlightChat() ? "bg-primary text-white " : "bg-white"}
+          ${
+            highlightChat()
+              ? "bg-primary bg-opacity-25 text-white "
+              : "bg-white"
+          }
         `}
       onClick={() => openChat()}
     >
-      <div className="flex gap-5 w-full">
+      <div className="flex gap-5 w-full max-">
         <UserProfilePicture profilePicture={currentMappedUser.profilePic} />
-        <div className="flex flex-col w-full">
-          <h1>{currentMappedUser.name}</h1>
-          <small className="text-gray-500 font-semibold">
+        <div className="flex flex-col w-full ">
+          <div className="flex gap-1 justify-between  ">
+            <h1 className="w-48 overflow-hidden text-ellipsis whitespace-nowrap  ">
+              {currentMappedUser.name}
+            </h1>
+            {getUnreadMessages()}
+          </div>
+          <small className="text-gray-500 w-56 overflow-hidden text-ellipsis whitespace-nowrap  ">
             {getLastMessage()}
           </small>
-          <small className="text-gray-500 text-[11.5px] text-end w-full">
+          <small className="text-gray-500 text-[11.5px] text-end w-full ">
             {getHourLastMessage()}
           </small>
         </div>
       </div>
-      <div onClick={() => createNewUsersChat(currentMappedUser._id!)}>
+      <div className="whitespace-nowrap">
         {!allChats.find((chat: any) =>
           chat.members
             .map((member: UserType) => member._id)
             .includes(currentMappedUser._id)
-        ) && <Button.CreateChat />}
+        ) && (
+          <Button.CreateChat
+            onClick={() => {
+              createNewUsersChat(currentMappedUser._id!).then(() => {
+                openChat();
+              });
+            }}
+          />
+        )}
       </div>
     </div>
   );

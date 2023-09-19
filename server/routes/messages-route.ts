@@ -18,8 +18,8 @@ export function getMessages() {
         },
         {
           lastMessage: savedMessage._id,
-          unread: {
-            $inc: 1,
+          $inc: {
+            unreadMessages: 1,
           },
         }
       );
@@ -56,5 +56,52 @@ export function getMessages() {
     }
   });
 
+  // clear unread messages
+  router.post("/reset-unread-messages", authMiddleware, async (req, res) => {
+    console.log("req", req.body);
+    try {
+      // find chats and update unread messages count to 0
+      const chat = await ChatSchema.findById(req.body.chatId);
+      if (!chat) {
+        return res.send({
+          success: false,
+          message: "Chat not found",
+        });
+      }
+
+      const updatedChat = await ChatSchema.findByIdAndUpdate(
+        req.body.chatId,
+        {
+          unreadMessages: 0,
+        },
+        {
+          new: true,
+        }
+      )
+        .populate("members")
+        .populate("lastMessage");
+
+      // find all unread messages of chat and update the them to read
+
+      await MessageSchema.updateMany(
+        {
+          chat: req.body.chatId,
+          read: false,
+        },
+        { read: true }
+      );
+
+      res.send({
+        success: true,
+        message: "Unread messages cleared successfully",
+        data: updatedChat,
+      });
+    } catch (error: any) {
+      res.send({
+        success: false,
+        message: "[Error clearing unread messages]: " + error,
+      });
+    }
+  });
   return router;
 }

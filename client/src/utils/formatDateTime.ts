@@ -7,16 +7,16 @@ import {
   parseISO,
 } from "date-fns";
 
-export function formatDateTime(dateISO: string): string {
+export function formatDateTime(dateISO: string | Date): string {
   const currentDate = new Date();
-  const date = parseISO(dateISO);
+  const date = parseISO(String(dateISO));
 
   if (isToday(date)) {
     const diffInMinutes = differenceInMinutes(currentDate, date);
 
     if (diffInMinutes < 60) {
       if (diffInMinutes <= 1) {
-        return "1 min ago";
+        return "Just now";
       } else {
         return `${diffInMinutes} mins ago`;
       }

@@ -1,6 +1,5 @@
 import { Message } from "@/types/messages";
 import { axiosInstance, fetcher } from ".";
-import useSWR from "swr";
 
 export const SendMessage = async (message: Message) => {
   try {
@@ -18,6 +17,20 @@ export const getCurrentChatMessages = async (chatId: string) => {
   try {
     const response = await axiosInstance.get(
       `/api/messages/get-all-messages/${chatId}`
+    );
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+export const resetUnreadMessageCount = async (chatId: string) => {
+  try {
+    const response = await axiosInstance.post(
+      "/api/messages/reset-unread-messages",
+      {
+        chatId,
+      }
     );
     return response.data;
   } catch (error: any) {

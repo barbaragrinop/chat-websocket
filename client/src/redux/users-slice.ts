@@ -4,8 +4,8 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 type UsersState = {
   user: User;
-  allUsers: User[]; // Corrigido para ser um array de objetos User
-  allChats: Chat[]; // Corrigido para ser um array de objetos Chat
+  allUsers: User[];
+  allChats: Chat[];
   selectedChat: Chat;
 };
 
